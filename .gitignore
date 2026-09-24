@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# Producción
+dist/
+dist-ssr/
+*.local
+
+# Variables de entorno (¡NUNCA subir a GitHub!)
+.env
+.env.local
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editores y SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
