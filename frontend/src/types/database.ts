@@ -1,90 +1,123 @@
-export type DebtStatus = 'PENDIENTE' | 'PAGO_PARCIAL' | 'PAGADO' | 'CANCELADO';
-
-export type PaymentMethod = 
-  | 'YAPE' 
-  | 'PLIN' 
-  | 'MERCADO_PAGO' 
-  | 'TRANSFERENCIA' 
-  | 'EFECTIVO' 
-  | 'OTRO';
-
-export type MatchType = 
-  | 'EXACT_NAME' 
-  | 'FUZZY_NAME' 
-  | 'REFERENCE_CODE' 
-  | 'MANUAL' 
-  | 'UNMATCHED';
-
-export type LogStatus = 
-  | 'CONCILIADO' 
-  | 'NO_CONCILIADO' 
-  | 'ANULADO';
+export type InventoryRole = 'owner' | 'collaborator';
+export type ProductStatus = 'ACTIVE' | 'WITHDRAWN' | 'ARCHIVED';
+export type ActionType = 'CREATE' | 'UPDATE' | 'MOVE' | 'WITHDRAW' | 'RESTOCK' | 'DELETE';
 
 export interface Profile {
   id: string;
   email: string;
   full_name: string | null;
-  yape_phone: string | null;
-  yape_qr_url: string | null;
-  plin_phone: string | null;
-  plin_qr_url: string | null;
-  mercadopago_link: string | null;
-  mercadopago_access_token: string | null;
-  webhook_secret: string;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 }
 
-export interface Debt {
+export interface Inventory {
   id: string;
-  user_id: string;
-  debtor_name: string;
-  debtor_phone: string | null;
-  debtor_email: string | null;
-  original_amount: number;
-  remaining_amount: number;
+  name: string;
+  description: string | null;
   currency: string;
-  loan_date: string;
-  due_date: string | null;
-  note: string | null;
-  status: DebtStatus;
-  payment_slug: string;
-  paid_at: string | null;
+  owner_id: string;
+  created_at: string;
+  updated_at: string;
+  role?: InventoryRole; // Rol del usuario actual en este inventario
+  is_owner?: boolean;
+}
+
+export interface InventoryUser {
+  id: string;
+  inventory_id: string;
+  user_id: string;
+  role: InventoryRole;
+  created_at: string;
+  profiles?: Profile;
+}
+
+export interface InventoryInvitation {
+  id: string;
+  inventory_id: string;
+  email: string;
+  role: InventoryRole;
+  status: 'pending' | 'accepted' | 'rejected';
+  invited_by: string;
+  created_at: string;
+}
+
+export interface Category {
+  id: string;
+  inventory_id: string;
+  name: string;
+  color: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  subcategories?: Subcategory[];
+}
+
+export interface Subcategory {
+  id: string;
+  inventory_id: string;
+  category_id: string;
+  name: string;
+  description: string | null;
   created_at: string;
   updated_at: string;
 }
 
-export interface PaymentLog {
+export interface Location {
   id: string;
-  user_id: string;
-  debt_id: string | null;
-  payer_name: string;
-  amount: number;
-  currency: string;
-  payment_method: PaymentMethod;
-  operation_number: string | null;
-  raw_concept: string | null;
-  matched_by: MatchType;
-  status: LogStatus;
+  inventory_id: string;
+  name: string;
+  code: string;
+  description: string | null;
   created_at: string;
+  updated_at: string;
+  product_count?: number;
 }
 
-export interface PublicDebtView {
-  debt_id: string;
-  payment_slug: string;
-  debtor_name: string;
-  original_amount: number;
-  remaining_amount: number;
-  currency: string;
-  loan_date: string;
-  due_date: string | null;
-  note: string | null;
-  status: DebtStatus;
-  paid_at: string | null;
-  creditor_name: string | null;
-  yape_phone: string | null;
-  yape_qr_url: string | null;
-  plin_phone: string | null;
-  plin_qr_url: string | null;
-  mercadopago_link: string | null;
+export interface Product {
+  id: string;
+  inventory_id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  min_stock: number;
+  category_id: string | null;
+  subcategory_id: string | null;
+  location_id: string;
+  images: string[]; // Máximo 3 URLs
+  status: ProductStatus;
+  withdrawal_reason?: string | null;
+  last_modified_by: string | null;
+  last_modified_by_email: string | null;
+  created_at: string;
+  updated_at: string;
+  categories?: {
+    id: string;
+    name: string;
+    color: string;
+  } | null;
+  subcategories?: {
+    id: string;
+    name: string;
+  } | null;
+  locations?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+}
+
+export interface AuditLog {
+  id: string;
+  inventory_id: string;
+  product_id: string | null;
+  product_name: string | null;
+  user_id: string | null;
+  user_email: string;
+  action_type: ActionType;
+  details: string;
+  metadata: Record<string, any>;
+  created_at: string;
 }

@@ -1,0 +1,37 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Validate Fullstack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package.json
+            frontend/package.json
+
+      - name: Install & Validate Backend
+        working-directory: ./backend
+        run: |
+          npm ci
+          node -e "console.log('Backend dependencies loaded successfully')"
+
+      - name: Install, Typecheck & Build Frontend PWA
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build

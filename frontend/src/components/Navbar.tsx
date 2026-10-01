@@ -1,109 +1,88 @@
 import React from 'react';
+import { Layers, ChevronDown, Users, LogOut, Shield, MapPin, Tag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  CreditCard, 
-  PlusCircle, 
-  Settings, 
-  LogOut, 
-  User as UserIcon, 
-  BellRing
-} from 'lucide-react';
 
 interface NavbarProps {
-  onOpenCreate: () => void;
-  onOpenSettings: () => void;
-  onOpenUnmatched: () => void;
-  unmatchedCount: number;
+  onOpenInventorySelector: () => void;
+  onOpenCollaborators: () => void;
+  onOpenLocations: () => void;
+  onOpenCategories: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  onOpenCreate,
-  onOpenSettings,
-  onOpenUnmatched,
-  unmatchedCount
+  onOpenInventorySelector,
+  onOpenCollaborators,
+  onOpenLocations,
+  onOpenCategories
 }) => {
-  const { user, profile, signOut } = useAuth();
+  const { currentInventory, user, signOut } = useAuth();
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        
-        {/* Logo & Marca */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-600 via-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-pink-500/20 text-lg">
-            🐷
+    <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+        {/* Lado Izquierdo: Logo y Selector de Inventario */}
+        <div className="flex items-center gap-3">
+          {/* Logo PWA */}
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-600/30 flex-shrink-0">
+            <Layers className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-purple-800 via-pink-700 to-indigo-700 bg-clip-text text-transparent">
-              MarranilloPay
-            </span>
-            <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 bg-pink-100 text-pink-800 rounded-full">
-              Automated Bot
-            </span>
-          </div>
+
+          {/* Selector de Inventario Activo (Multi-Tenancy) */}
+          <button
+            onClick={onOpenInventorySelector}
+            className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl transition-all group text-left max-w-[200px] sm:max-w-xs"
+          >
+            <div className="truncate">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">
+                Inventario Activo
+              </span>
+              <span className="text-xs sm:text-sm font-extrabold text-white truncate block group-hover:text-blue-400 transition-colors">
+                {currentInventory?.name || 'Seleccionar...'}
+              </span>
+            </div>
+            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-white flex-shrink-0" />
+          </button>
         </div>
 
-        {/* Acciones & Perfil */}
-        {user && (
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            
-            {/* Botón Pagos Pendientes de Conciliar (Notificación) */}
-            {unmatchedCount > 0 && (
-              <button
-                onClick={onOpenUnmatched}
-                className="relative inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-semibold text-amber-800 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 transition-all shadow-sm animate-pulse"
-                title="Pagos recibidos sin conciliar"
-              >
-                <BellRing className="w-4 h-4 mr-1.5 text-amber-600" />
-                <span>{unmatchedCount} Sin Vincular</span>
-              </button>
-            )}
+        {/* Lado Derecho: Accesos Rápidos de Gestión y Perfil */}
+        <div className="flex items-center gap-2">
+          {/* Botón de Categorías (Visible en tablets/desktop) */}
+          <button
+            onClick={onOpenCategories}
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors"
+            title="Categorías y Subcategorías"
+          >
+            <Tag className="w-3.5 h-3.5 text-blue-400" /> Categorías
+          </button>
 
-            {/* Botón Nueva Deuda */}
-            <button
-              onClick={onOpenCreate}
-              className="inline-flex items-center px-3.5 py-2 text-sm font-bold text-white bg-purple-700 hover:bg-purple-800 active:bg-purple-900 rounded-lg shadow-sm hover:shadow transition-all"
-            >
-              <PlusCircle className="w-4 h-4 mr-1.5" />
-              <span className="hidden sm:inline">Nueva Deuda</span>
-              <span className="sm:hidden">Crear</span>
-            </button>
+          {/* Botón de Ubicaciones Físicas y Etiquetas */}
+          <button
+            onClick={onOpenLocations}
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors"
+            title="Ubicaciones y Generador de Etiquetas"
+          >
+            <MapPin className="w-3.5 h-3.5 text-amber-400" /> Ubicaciones
+          </button>
 
-            {/* Botón Configuración de Cobro */}
-            <button
-              onClick={onOpenSettings}
-              className="p-2 text-slate-600 hover:text-purple-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
-              title="Configurar QRs de Yape, Plin y Mercado Pago"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
+          {/* Botón de Colaboradores / Equipo */}
+          <button
+            onClick={onOpenCollaborators}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-semibold rounded-xl border border-indigo-500/30 transition-all active:scale-95"
+            title="Gestionar Colaboradores"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Equipo</span>
+          </button>
 
-            {/* Info de Usuario */}
-            <div className="hidden md:flex items-center space-x-2 pl-2 border-l border-slate-200 text-xs text-slate-600">
-              <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-700">
-                <UserIcon className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-slate-800 truncate max-w-[130px]">
-                  {profile?.full_name || user.email?.split('@')[0]}
-                </p>
-                <p className="text-slate-400 text-[10px] truncate max-w-[130px]">
-                  {user.email}
-                </p>
-              </div>
-            </div>
-
-            {/* Logout */}
-            <button
-              onClick={() => signOut()}
-              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Cerrar sesión"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-
-          </div>
-        )}
+          {/* Botón de Cerrar Sesión */}
+          <button
+            onClick={() => signOut()}
+            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition-colors"
+            title={`Cerrar Sesión (${user?.email})`}
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </header>
   );
